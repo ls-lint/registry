@@ -26,7 +26,7 @@ func (g *googleStorage) newClient(ctx context.Context) (*storage.Client, error) 
 }
 
 func (g *googleStorage) upload(ctx context.Context, client *storage.Client, object string, data []byte) error {
-	ctx, cancel := context.WithTimeout(ctx, time.Second*10)
+	ctx, cancel := context.WithTimeout(ctx, time.Second*30)
 	defer cancel()
 
 	wc := client.Bucket(g.getBucket()).Object(object).NewWriter(ctx)

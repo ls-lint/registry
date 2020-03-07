@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/md5"
 	"fmt"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
@@ -68,8 +69,11 @@ func (database *database) publishPackage(publish *Publish, user *User) (*Package
 }
 
 func (database *database) publishRelease(publish *Publish, _package *Package) (*Release, error) {
+	hash := fmt.Sprintf("%x", md5.Sum(publish.Data))
+
 	release := &Release{
 		Version: &publish.Version,
+		Hash:    &hash,
 		Package: _package,
 	}
 

@@ -1,0 +1,8 @@
+ls:
+  .dir: kebab-case
+  .go: snake_case
+  .json: kebab-case
+
+ignore:
+  - .idea
+  - .git

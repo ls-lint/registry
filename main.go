@@ -34,11 +34,12 @@ func main() {
 
 	// api
 	api := &api{
-		storage:  googleStorage,
-		database: database,
-		port:     os.Getenv("API_PORT"),
-		mode:     os.Getenv("API_MODE"),
-		RWMutex:  new(sync.RWMutex),
+		storage:         googleStorage,
+		database:        database,
+		port:            os.Getenv("API_PORT"),
+		mode:            os.Getenv("API_MODE"),
+		authIdentityKey: "id",
+		RWMutex:         new(sync.RWMutex),
 	}
 
 	if err = api.startServer(); err != nil {

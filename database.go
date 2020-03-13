@@ -39,16 +39,6 @@ func (database *database) migrate() {
 	)
 }
 
-func (database *database) getUserByToken(token string) (*User, error) {
-	var user User
-
-	return &user, database.connection.
-		Preload("Tokens", "token = ?", token).
-		Joins("JOIN tokens ON users.id=tokens.id AND tokens.token = ?", token).
-		First(&user).
-		Error
-}
-
 func (database *database) publishPackage(_package *Package) error {
 	return database.connection.
 		FirstOrCreate(_package, &Package{

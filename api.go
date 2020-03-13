@@ -11,10 +11,11 @@ import (
 )
 
 type api struct {
-	database *database
-	storage  storage.Storage
-	port     string
-	mode     string
+	database        *database
+	storage         storage.Storage
+	port            string
+	mode            string
+	authIdentityKey string
 	*sync.RWMutex
 }
 
@@ -30,6 +31,13 @@ func (api *api) getPort() string {
 	defer api.RUnlock()
 
 	return api.port
+}
+
+func (api *api) getAuthIdentityKey() string {
+	api.RLock()
+	defer api.RUnlock()
+
+	return api.authIdentityKey
 }
 
 func (api *api) response(error, data interface{}) gin.H {
@@ -51,13 +59,32 @@ func (api *api) startServer() error {
 	r := gin.Default()
 	r.Use(api.cors())
 
+	// auth
+	authMiddleware, err := api.authMiddleware()
+
+	if err != nil {
+		return err
+	}
+
 	apiGroup := r.Group("/api")
 	{
 		// health
 		apiGroup.GET("/ok", api.ok)
 
+		// auth
+		apiGroup.POST("/login", authMiddleware.LoginHandler)
+		apiGroup.POST("/register", api.register)
+
 		// publish
 		apiGroup.POST("/publish", api.publish)
+
+		// auth
+		authGroup := apiGroup.Group("/auth")
+		authGroup.Use(authMiddleware.MiddlewareFunc())
+		{
+			authGroup.GET("/refresh_token", authMiddleware.RefreshHandler)
+			authGroup.GET("/logout", authMiddleware.LogoutHandler)
+		}
 	}
 
 	if os.Getenv("ENV") != "prod" {

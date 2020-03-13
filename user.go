@@ -7,9 +7,9 @@ import (
 
 type User struct {
 	gorm.Model
-	Username *string `gorm:"not null" json:"username"`
-	Password *string `gorm:"not null" json:"password"`
-	Email    *string `gorm:"not null" json:"email"`
+	Username *string `gorm:"unique;not null" json:"username" binding:"required"`
+	Password *string `gorm:"not null" json:"password" binding:"required"`
+	Email    *string `gorm:"unique;not null" json:"email" binding:"required"`
 
 	Packages []*Package `json:"packages"`
 	Tokens   []*Token   `json:"tokens"`
@@ -37,6 +37,13 @@ func (u *User) getUsername() *string {
 	defer u.RUnlock()
 
 	return u.Username
+}
+
+func (u *User) getPassword() *string {
+	u.RLock()
+	defer u.RUnlock()
+
+	return u.Password
 }
 
 func (u *User) getTokens() []*Token {

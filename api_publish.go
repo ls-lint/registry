@@ -25,7 +25,7 @@ func (api *api) publish(c *gin.Context) {
 	}
 
 	// login
-	user, err := api.database.getUserByToken(publish.Token)
+	user, err := api.database.tokenLogin(publish.Token)
 
 	if err != nil && err != gorm.ErrRecordNotFound {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, api.response(err.Error(), nil))

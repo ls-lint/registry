@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/appleboy/gin-jwt/v2"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
@@ -19,10 +18,8 @@ func (api *api) authMiddleware() (*jwt.GinJWTMiddleware, error) {
 		IdentityKey: api.getAuthIdentityKey(),
 		PayloadFunc: func(data interface{}) jwt.MapClaims {
 			if v, ok := data.(*User); ok {
-				v.init()
-
 				return jwt.MapClaims{
-					api.getAuthIdentityKey(): *v.getUsername(),
+					api.getAuthIdentityKey(): v.Username,
 				}
 			}
 
@@ -30,7 +27,6 @@ func (api *api) authMiddleware() (*jwt.GinJWTMiddleware, error) {
 		},
 		IdentityHandler: func(c *gin.Context) interface{} {
 			claims := jwt.ExtractClaims(c)
-			spew.Dump(claims)
 			username := claims[api.getAuthIdentityKey()].(string)
 
 			return &User{

@@ -77,17 +77,13 @@ func (api *api) publish(c *gin.Context) {
 	}
 
 	// publish package
-	_package, err = api.database.publishPackage(_package)
-
-	if err != nil {
+	if err = api.database.publishPackage(_package); err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, api.response(fmt.Errorf("publish package failed").Error(), nil))
 		return
 	}
 
 	// publish release
-	release, err = api.database.publishRelease(release)
-
-	if err != nil {
+	if err = api.database.publishRelease(release); err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, api.response(fmt.Errorf("publish release failed").Error(), nil))
 		return
 	}

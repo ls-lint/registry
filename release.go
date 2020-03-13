@@ -42,10 +42,3 @@ func (r *Release) getTag() *string {
 
 	return r.Tag
 }
-
-func (r *Release) getHash() *string {
-	r.RLock()
-	defer r.RUnlock()
-
-	return r.Hash
-}

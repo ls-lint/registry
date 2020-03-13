@@ -49,8 +49,8 @@ func (database *database) getUserByToken(token string) (*User, error) {
 		Error
 }
 
-func (database *database) publishPackage(_package *Package) (*Package, error) {
-	return _package, database.connection.
+func (database *database) publishPackage(_package *Package) error {
+	return database.connection.
 		FirstOrCreate(_package, &Package{
 			Name:   _package.getName(),
 			UserId: _package.getUser().getId(),
@@ -58,8 +58,8 @@ func (database *database) publishPackage(_package *Package) (*Package, error) {
 		Error
 }
 
-func (database *database) publishRelease(release *Release) (*Release, error) {
-	return release, database.connection.
+func (database *database) publishRelease(release *Release) error {
+	return database.connection.
 		FirstOrCreate(release, &Release{
 			Tag:       release.getTag(),
 			PackageId: release.getPackage().getId(),

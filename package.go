@@ -11,9 +11,39 @@ type Package struct {
 	Public *bool   `gorm:"not null" json:"public"`
 
 	UserId *uint `gorm:"not null" json:"userId"`
-	User *User `json:"user"`
+	User   *User `json:"user"`
 
 	Releases []*Release `json:"releases"`
 
 	*sync.RWMutex `json:"-"`
+}
+
+func createPackage(publish *Publish, user *User) *Package {
+	return &Package{
+		Name:    &publish.Package,
+		Public:  &publish.Public,
+		User:    user,
+		RWMutex: new(sync.RWMutex),
+	}
+}
+
+func (p *Package) getId() *uint {
+	p.RLock()
+	defer p.RUnlock()
+
+	return &p.ID
+}
+
+func (p *Package) getName() *string {
+	p.RLock()
+	defer p.RUnlock()
+
+	return p.Name
+}
+
+func (p *Package) getUser() *User {
+	p.Lock()
+	defer p.Unlock()
+
+	return p.User
 }

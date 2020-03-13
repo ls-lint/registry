@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/ls-lint/registry/storage"
 	"log"
 	"os"
 	"sync"
@@ -8,7 +9,7 @@ import (
 
 func main() {
 	var err error
-	
+
 	// database
 	database := &database{
 		host:     os.Getenv("DB_HOST"),
@@ -24,19 +25,20 @@ func main() {
 
 	database.migrate()
 
-	// google storage
-	googleStorage := &googleStorage{
-		Bucket:  "ls-lint",
-		RWMutex: new(sync.RWMutex),
+	// storage
+	googleStorage, err := storage.GetStorage("google")
+
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	// api
 	api := &api{
-		googleStorage: googleStorage,
-		database:      database,
-		port:          os.Getenv("API_PORT"),
-		mode:          os.Getenv("API_MODE"),
-		RWMutex:       new(sync.RWMutex),
+		storage:  googleStorage,
+		database: database,
+		port:     os.Getenv("API_PORT"),
+		mode:     os.Getenv("API_MODE"),
+		RWMutex:  new(sync.RWMutex),
 	}
 
 	if err = api.startServer(); err != nil {

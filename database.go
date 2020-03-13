@@ -1,11 +1,9 @@
 package main
 
 import (
-	"crypto/md5"
 	"fmt"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
-	"strings"
 )
 
 type database struct {
@@ -41,7 +39,7 @@ func (database *database) migrate() {
 	)
 }
 
-func (database *database) tokenLogin(token string) (*User, error) {
+func (database *database) getUserByToken(token string) (*User, error) {
 	var user User
 
 	return &user, database.connection.
@@ -51,36 +49,20 @@ func (database *database) tokenLogin(token string) (*User, error) {
 		Error
 }
 
-func (database *database) publishPackage(publish *Publish, user *User) (*Package, error) {
-	publish.Package = strings.ToLower(publish.Package)
-
-	_package := &Package{
-		Name:   &publish.Package,
-		Public: &publish.Public,
-		User:   user,
-	}
-
+func (database *database) publishPackage(_package *Package) (*Package, error) {
 	return _package, database.connection.
 		FirstOrCreate(_package, &Package{
-			Name:   _package.Name,
-			UserId: &user.ID,
+			Name:   _package.getName(),
+			UserId: _package.getUser().getId(),
 		}).
 		Error
 }
 
-func (database *database) publishRelease(publish *Publish, _package *Package) (*Release, error) {
-	hash := fmt.Sprintf("%x", md5.Sum(publish.Data))
-
-	release := &Release{
-		Version: &publish.Version,
-		Hash:    &hash,
-		Package: _package,
-	}
-
+func (database *database) publishRelease(release *Release) (*Release, error) {
 	return release, database.connection.
 		FirstOrCreate(release, &Release{
-			Version:   &publish.Version,
-			PackageId: &_package.ID,
+			Tag:       release.getTag(),
+			PackageId: release.getPackage().getId(),
 		}).
 		Error
 }

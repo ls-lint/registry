@@ -16,3 +16,32 @@ type User struct {
 
 	*sync.RWMutex `json:"-"`
 }
+
+func (u *User) init() {
+	u.RWMutex = new(sync.RWMutex)
+
+	for _, token := range u.Tokens {
+		token.init()
+	}
+}
+
+func (u *User) getId() *uint {
+	u.RLock()
+	defer u.RUnlock()
+
+	return &u.ID
+}
+
+func (u *User) getUsername() *string {
+	u.RLock()
+	defer u.RUnlock()
+
+	return u.Username
+}
+
+func (u *User) getTokens() []*Token {
+	u.RLock()
+	defer u.RUnlock()
+
+	return u.Tokens
+}

@@ -28,12 +28,12 @@ func (api *api) publish(c *gin.Context) {
 	user, err := api.database.tokenLogin(publish.Token)
 
 	if err != nil && err != gorm.ErrRecordNotFound {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, api.response(err.Error(), nil))
+		c.AbortWithStatusJSON(http.StatusInternalServerError, api.response(err.Error(), nil))
 		return
 	}
 
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, api.response(fmt.Errorf("authorization failed").Error(), nil))
+		c.AbortWithStatusJSON(http.StatusUnauthorized, api.response(fmt.Errorf("authorization failed").Error(), nil))
 		return
 	}
 

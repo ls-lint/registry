@@ -3,11 +3,16 @@ package main
 import (
 	"github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"os"
 	"time"
 )
+
+func (api *api) getUserId(c *gin.Context) uint {
+	return uint(jwt.ExtractClaims(c)[api.getAuthIdentityKey()].(float64))
+}
 
 func (api *api) authMiddleware() (*jwt.GinJWTMiddleware, error) {
 	return jwt.New(&jwt.GinJWTMiddleware{
@@ -19,18 +24,17 @@ func (api *api) authMiddleware() (*jwt.GinJWTMiddleware, error) {
 		PayloadFunc: func(data interface{}) jwt.MapClaims {
 			if v, ok := data.(*User); ok {
 				return jwt.MapClaims{
-					api.getAuthIdentityKey(): v.Username,
+					api.getAuthIdentityKey(): v.ID,
 				}
 			}
 
 			return jwt.MapClaims{}
 		},
 		IdentityHandler: func(c *gin.Context) interface{} {
-			claims := jwt.ExtractClaims(c)
-			username := claims[api.getAuthIdentityKey()].(string)
-
 			return &User{
-				Username: &username,
+				Model: gorm.Model{
+					ID: api.getUserId(c),
+				},
 			}
 		},
 		Authenticator: func(c *gin.Context) (interface{}, error) {

@@ -82,8 +82,14 @@ func (api *api) startServer() error {
 		authGroup := apiGroup.Group("/auth")
 		authGroup.Use(authMiddleware.MiddlewareFunc())
 		{
+			// auth
 			authGroup.GET("/refresh_token", authMiddleware.RefreshHandler)
 			authGroup.GET("/logout", authMiddleware.LogoutHandler)
+
+			// token
+			authGroup.GET("/token", api.tokens)
+			authGroup.POST("/token", api.createToken)
+			authGroup.DELETE("/token", api.deleteToken)
 		}
 	}
 

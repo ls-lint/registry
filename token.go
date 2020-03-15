@@ -21,13 +21,6 @@ func (t *Token) init() {
 	t.RWMutex = new(sync.RWMutex)
 }
 
-func (t *Token) getId() uint {
-	t.RLock()
-	defer t.RUnlock()
-
-	return t.ID
-}
-
 func (t *Token) getToken() *string {
 	t.RLock()
 	defer t.RUnlock()

@@ -58,6 +58,7 @@ func (api *api) startServer() error {
 	gin.SetMode(api.getMode())
 	r := gin.Default()
 	r.Use(api.cors())
+	r.Use(gin.Recovery())
 
 	// auth
 	authMiddleware, err := api.authMiddleware()
@@ -78,6 +79,9 @@ func (api *api) startServer() error {
 		// publish
 		apiGroup.POST("/publish", api.publish)
 
+		// package
+		apiGroup.GET("/package/:user/:name", api._package)
+
 		// auth
 		authGroup := apiGroup.Group("/auth")
 		authGroup.Use(authMiddleware.MiddlewareFunc())
@@ -90,6 +94,9 @@ func (api *api) startServer() error {
 			authGroup.GET("/token", api.tokens)
 			authGroup.POST("/token", api.createToken)
 			authGroup.DELETE("/token", api.deleteToken)
+
+			// package
+			authGroup.GET("/package/:user/:name", api._package)
 		}
 	}
 
